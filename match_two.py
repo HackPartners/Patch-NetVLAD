@@ -84,12 +84,12 @@ def plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, p
         plt.imshow(im_allpatch_matches)
         # plt.show()
         plt.axis('off')
-        filename = join(plot_save_path, 'patchMatchings.png')
+        filename = join(plot_save_path, 'patchMatchings6.png')
         plt.savefig(filename, dpi=300, bbox_inches='tight')
         plt.close()
 
 
-def match_two(model, device, config, im_one, im_two, plot_save_path):
+def match_two(model, device, config, im_one, im_two, plot_save_path=None):
 
     pool_size = int(config['global_params']['num_pcs'])
 
@@ -143,7 +143,7 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
 
     print(f"Similarity score between the two images is: {score:.5f}. Larger scores indicate better matches.")
 
-    if config['feature_match']['matcher'] == 'RANSAC':
+    if config['feature_match']['matcher'] in ['RANSAC']:
         if plot_save_path is not None:
             tqdm.write('====> Plotting Local Features and save them to ' + str(join(plot_save_path, 'patchMatchings.png')))
 
@@ -153,15 +153,17 @@ def match_two(model, device, config, im_one, im_two, plot_save_path):
         # cv2 resize slightly different from torch, but for visualisation only not a big problem
 
         plot_two(cv_im_one, cv_im_two, inlier_keypoints_one, inlier_keypoints_two, plot_save_path)
+    
+    return score
 
 
 def main():
     parser = argparse.ArgumentParser(description='Patch-NetVLAD-Match-Two')
-    parser.add_argument('--config_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'configs/performance.ini'),
+    parser.add_argument('--config_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'configs/speed.ini'),
                         help='File name (with extension) to an ini file that stores most of the configuration data for patch-netvlad')
-    parser.add_argument('--first_im_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'example_images/tokyo_db.png'),
+    parser.add_argument('--first_im_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'example_images/627387.png'),
                         help='Full path (with extension) to an image file')
-    parser.add_argument('--second_im_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'example_images/tokyo_query.jpg'),
+    parser.add_argument('--second_im_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'example_images/659198_query.png'),
                         help='Full path (with extension) to another image file')
     parser.add_argument('--plot_save_path', type=str, default=join(PATCHNETVLAD_ROOT_DIR, 'results'),
                         help='Path plus optional prefix pointing to a location to save the output matching plot')
